@@ -4,7 +4,9 @@ import requests
 from PIL import Image, ImageDraw, ImageFont, ImageOps, ImageFilter
 
 # --- 設定 ---
-GAME_ID = "7dge5wp2"  # The Hive のゲームID
+GAME_ID = "hive"  # ご指定に合わせて変更
+TARGET_CATEGORY = "Gravity"  # 取得対象とするカテゴリ名
+
 DISCORD_WEBHOOK_URL = os.environ.get("DISCORD_WEBHOOK_URL")
 LAST_RUN_FILE = "last_run_id.txt"
 
@@ -177,7 +179,7 @@ def main():
         with open(LAST_RUN_FILE, "r") as f:
             last_run_id = f.read().strip()
             
-    api_url = f"https://www.speedrun.com/api/v1/runs?game={GAME_ID}&status=verified&orderby=verify-date&direction=desc&max=10&embed=category,level,players"
+    api_url = f"https://www.speedrun.com/api/v1/runs?game={GAME_ID}&status=verified&orderby=verify-date&direction=desc&max=20&embed=category,level,players"
     res = requests.get(api_url).json()
     
     runs = res.get("data", [])
@@ -189,6 +191,24 @@ def main():
     for run in runs:
         if run["id"] == last_run_id:
             break
+        
+        # カテゴリ名の判定（Gravityに絞り込む）
+        cat_rel = run.get("category")
+        category_name = ""
+        if isinstance(cat_rel, dict):
+            cat_data = cat_rel.get("data", {})
+            if isinstance(cat_data, dict):
+                category_name = cat_data.get("name", "")
+            elif isinstance(cat_data, list) and len(cat_data) > 0:
+                category_name = cat_data[0].get("name", "")
+        elif isinstance(cat_rel, list) and len(cat_rel) > 0:
+            if isinstance(cat_rel[0], dict):
+                category_name = cat_rel[0].get("name", "")
+                
+        # 指定したカテゴリ名（Gravity）でなければスキップ
+        if TARGET_CATEGORY.lower() not in category_name.lower():
+            continue
+            
         new_runs.append(run)
         
     if not new_runs:
@@ -198,7 +218,7 @@ def main():
     new_runs.reverse()
     
     for run in new_runs:
-        # レベル名・カテゴリ名の安全な取得
+        # レベル名の安全な取得
         level_name = ""
         level_rel = run.get("level")
         if isinstance(level_rel, dict):
@@ -223,9 +243,7 @@ def main():
             if isinstance(cat_rel[0], dict):
                 category_name = cat_rel[0].get("name", "")
         
-        # ★デバッグ用に出力してみる
         print(f"取得データ確認 -> Level: '{level_name}' / Category: '{category_name}'")
-        # --- ここまで修正 ---
 
         division_name = f"{level_name} - {category_name}".strip(" -")
         if not division_name:
