@@ -14,7 +14,8 @@ LOGO_URL = "https://playhive.com/_next/static/media/Hive.9ce7fa58.png"
 # 取得した種目名（例: "Gravity - 5 Maps"）などの部分一致で背景を出し分ける辞書
 # ※ Imgurの直リンク (i.imgur.com/...) も使用可能です
 BACKGROUND_URLS = {
-    "5 Maps": "https://i.imgur.com/XXXXXXX.png",
+    "5 Maps": "https://i.imgur.com/1gY2pA4.png",
+    "5 Maps (No Custom Server)": "https://i.imgur.com/xfFhLxa.png",
     "Abstract": "https://cdn.playhive.com/maps/grav_abstract.jpg",
     "Apartments": "https://cdn.playhive.com/maps/grav_apartments.jpg",
     "Beanstalk": "https://cdn.playhive.com/maps/grav_beanstalk.jpg",
