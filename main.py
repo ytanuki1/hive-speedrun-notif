@@ -11,8 +11,6 @@ LAST_RUN_FILE = "last_run_id.txt"
 LOGO_URL = "https://playhive.com/_next/static/media/Hive.9ce7fa58.png"
 
 # 部門（カテゴリ/レベル名）ごとの背景画像URL
-# 取得した種目名（例: "Gravity - 5 Maps"）などの部分一致で背景を出し分ける辞書
-# ※ Imgurの直リンク (i.imgur.com/...) も使用可能です
 BACKGROUND_URLS = {
     "5 Maps": "https://i.imgur.com/1gY2pA4.png",
     "5 Maps (No Custom Server)": "https://i.imgur.com/xfFhLxa.png",
@@ -56,13 +54,12 @@ BACKGROUND_URLS = {
     "Triangles": "https://cdn.playhive.com/maps/grav_triangles.jpg",
     "Twisted": "https://cdn.playhive.com/maps/grav_twisted.jpg",
     "Under The Sea": "https://cdn.playhive.com/maps/grav_underthesea.jpg",
-    "default": "https://i.imgur.com/xfFhLxa.png",
+    "default": "https://i.imgur.com/1gY2pA4.png"
 }
 
 # --- ユーティリティ関数（画像生成用） ---
 def _load_font(size: int):
     try:
-        # Mojanglesフォントがある場合は読み込む（同じディレクトリに配置してください）
         return ImageFont.truetype("mojangles.ttf", size)
     except IOError:
         return ImageFont.load_default()
@@ -77,7 +74,6 @@ def _draw_text_with_shadow(draw, pos, text, font, fill, shadow=(63, 63, 63, 255)
 
 def _fetch_image(url):
     try:
-        # Imgur等のbot弾き対策として、一般的なブラウザのリクエストを偽装
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
             "Accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
@@ -91,11 +87,7 @@ def _fetch_image(url):
         return None
 
 def _fetch_background(division_name, size):
-    # 部門名から対応する背景を探す
     bg_url = BACKGROUND_URLS["default"]
-    
-    # 【対策】キーの文字数が長い順（より具体的な順）にソートしてチェックする
-    # 例: "5 Maps (No Custom Server)" が "5 Maps" より先にチェックされるようにする
     sorted_keys = sorted(BACKGROUND_URLS.keys(), key=len, reverse=True)
     
     for key in sorted_keys:
@@ -111,7 +103,6 @@ def _fetch_background(division_name, size):
     else:
         img = ImageOps.fit(img, size, method=Image.LANCZOS, centering=(0.5, 0.4))
     
-    # 背景をぼかして暗くする処理
     img = img.filter(ImageFilter.GaussianBlur(2))
     dark_overlay = Image.new("RGBA", size, (0, 0, 0, 90))
     result = Image.alpha_composite(img.convert("RGBA"), dark_overlay).convert("RGB")
@@ -127,7 +118,6 @@ def generate_notification_image(division_name, player_name, time_str, avatar_url
     center_x = width // 2
     cell_bg = (15, 15, 15, 128)
     
-    # フォント準備
     font_title = _load_font(30)
     font_player = _load_font(36)
     font_time = _load_font(72)
@@ -182,18 +172,17 @@ def main():
         print("Webhook URLが設定されていません。")
         return
         
-    # 前回確認したIDを読み込む
     last_run_id = ""
     if os.path.exists(LAST_RUN_FILE):
         with open(LAST_RUN_FILE, "r") as f:
             last_run_id = f.read().strip()
             
-    # Speedrun.com API呼び出し (embed=category,level,playersで付随情報も一括取得)
     api_url = f"https://www.speedrun.com/api/v1/runs?game={GAME_ID}&status=verified&orderby=verify-date&direction=desc&max=10&embed=category,level,players"
     res = requests.get(api_url).json()
     
     runs = res.get("data", [])
     if not runs:
+        print("データが取得できませんでした。")
         return
         
     new_runs = []
@@ -206,21 +195,30 @@ def main():
         print("新着記録はありません。")
         return
         
-    # 古いものから順に処理
     new_runs.reverse()
     
     for run in new_runs:
-        # 種目名の構築 (例: Level名 - Category名)
-        level_data = run.get("level", {}).get("data", {})
-        category_data = run.get("category", {}).get("data", {})
-        level_name = level_data.get("name", "")
-        category_name = category_data.get("name", "")
+        # 安全にレベル名・カテゴリ名を取得する処理
+        level_data = run.get("level", {})
+        if isinstance(level_data, dict):
+            level_name = level_data.get("data", {}).get("name", "")
+        elif isinstance(level_data, list) and len(level_data) > 0:
+            level_name = level_data[0].get("name", "")
+        else:
+            level_name = ""
+
+        category_data = run.get("category", {})
+        if isinstance(category_data, dict):
+            category_name = category_data.get("data", {}).get("name", "")
+        elif isinstance(category_data, list) and len(category_data) > 0:
+            category_name = category_data[0].get("name", "")
+        else:
+            category_name = ""
         
         division_name = f"{level_name} - {category_name}".strip(" -")
         if not division_name:
             division_name = "Gravity"
             
-        # プレイヤー名とアイコンの取得
         player_name = "Unknown"
         avatar_url = None
         players = run.get("players", {}).get("data", [])
@@ -229,26 +227,22 @@ def main():
             player_name = player.get("names", {}).get("international", player.get("name", "Unknown"))
             avatar_url = player.get("assets", {}).get("image", {}).get("uri")
             
-        # タイムのフォーマット
         time_seconds = run["times"]["primary_t"]
         minutes = int(time_seconds // 60)
         seconds = time_seconds % 60
         time_str = f"{minutes}:{seconds:06.3f}" if minutes > 0 else f"{seconds:.3f}"
         
-        # 画像生成
         img = generate_notification_image(division_name, player_name, time_str, avatar_url)
         img_byte_arr = io.BytesIO()
         img.save(img_byte_arr, format='PNG')
         img_byte_arr = img_byte_arr.getvalue()
         
-        # Discordへ送信
         payload = {"content": f"**{division_name}** で **{player_name}** が記録を更新しました！\nTime: **{time_str}**"}
         files = {"file": ("result.png", img_byte_arr, "image/png")}
         
         requests.post(DISCORD_WEBHOOK_URL, data=payload, files=files)
         print(f"通知を送信しました: {player_name} - {time_str}")
         
-    # 最後に処理したIDを保存
     with open(LAST_RUN_FILE, "w") as f:
         f.write(new_runs[-1]["id"])
 
