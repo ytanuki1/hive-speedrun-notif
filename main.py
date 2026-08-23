@@ -23,7 +23,7 @@ BACKGROUND_URLS = {
     "Concrete": "https://cdn.playhive.com/maps/grav_concrete.jpg",
     "Cyberpunk": "https://cdn.playhive.com/maps/grav_cyberpunk.jpg",
     "Data": "https://cdn.playhive.com/maps/grav_beehive.jpg",
-    "Depths": "https://cdn.playhive.com/maps/grav_depth.jpg"
+    "Depths": "https://cdn.playhive.com/maps/grav_depth.jpg",
     "Glitched": "https://cdn.playhive.com/maps/grav_glitched.jpg",
     "Groovy": "https://cdn.playhive.com/maps/grav_groovy.jpg",
     "Jungle": "https://cdn.playhive.com/maps/grav_jungle.jpg",
