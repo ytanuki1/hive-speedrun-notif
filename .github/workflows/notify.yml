@@ -1,0 +1,32 @@
+name: Speedrun Notifier
+
+on:
+  schedule:
+    - cron: '*/30 * * * *' # 30分ごとに実行
+  workflow_dispatch: # 手動実行ボタンも有効化
+
+jobs:
+  check-and-notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run notifier script
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: python main.py
+
+      - name: Commit and push last run ID
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "Update last_run_id.txt"
+          file_pattern: "last_run_id.txt"
