@@ -17,13 +17,13 @@ BACKGROUND_URLS = {
     "5 Maps": "https://i.imgur.com/XXXXXXX.png",
     "Abstract": "https://cdn.playhive.com/maps/grav_abstract.jpg",
     "Apartments": "https://cdn.playhive.com/maps/grav_apartments.jpg",
-    "Beanstalk": "https://i.imgur.com/ZZZZZZZ.png",
-    "Beehive": "https://i.imgur.com/ZZZZZZZ.png",
-    "Concrete": "https://i.imgur.com/ZZZZZZZ.png",
-    "Cyberpunk": "https://i.imgur.com/ZZZZZZZ.png",
-    "Data": "https://i.imgur.com/ZZZZZZZ.png",
-    "Depths": "https://i.imgur.com/ZZZZZZZ.png"
-    "Glitched": "https://i.imgur.com/ZZZZZZZ.png"
+    "Beanstalk": "https://cdn.playhive.com/maps/grav_beanstalk.jpg",
+    "Beehive": "https://cdn.playhive.com/maps/grav_beehive.jpg",
+    "Concrete": "https://cdn.playhive.com/maps/grav_concrete.jpg",
+    "Cyberpunk": "https://cdn.playhive.com/maps/grav_cyberpunk.jpg",
+    "Data": "https://cdn.playhive.com/maps/grav_beehive.jpg",
+    "Depths": "https://cdn.playhive.com/maps/grav_depth.jpg"
+    "Glitched": "https://cdn.playhive.com/maps/grav_glitched.jpg"
 }
 
 # --- ユーティリティ関数（画像生成用） ---
