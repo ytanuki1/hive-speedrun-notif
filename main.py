@@ -23,7 +23,38 @@ BACKGROUND_URLS = {
     "Cyberpunk": "https://cdn.playhive.com/maps/grav_cyberpunk.jpg",
     "Data": "https://cdn.playhive.com/maps/grav_beehive.jpg",
     "Depths": "https://cdn.playhive.com/maps/grav_depth.jpg"
-    "Glitched": "https://cdn.playhive.com/maps/grav_glitched.jpg"
+    "Glitched": "https://cdn.playhive.com/maps/grav_glitched.jpg",
+    "Groovy": "https://cdn.playhive.com/maps/grav_groovy.jpg",
+    "Jungle": "https://cdn.playhive.com/maps/grav_jungle.jpg",
+    "Lava": "https://cdn.playhive.com/maps/grav_lava.jpg",
+    "Pixels": "https://cdn.playhive.com/maps/grav_pixels.jpg",
+    "Shapes": "https://cdn.playhive.com/maps/grav_shapes.jpg",
+    "Shelves": "https://cdn.playhive.com/maps/grav_shelves.jpg",
+    "Shrine": "https://cdn.playhive.com/maps/grav_shrine.jpg",
+    "Stairs": "https://cdn.playhive.com/maps/grav_stairs.jpg",
+    "Toxic": "https://cdn.playhive.com/maps/grav_toxic.jpg",
+    "Waterways": "https://cdn.playhive.com/maps/grav_waterways.jpg",
+    "Clockwork": "https://cdn.playhive.com/maps/grav_clockwork.jpg",
+    "Construction": "https://cdn.playhive.com/maps/grav_construction.jpg",
+    "Daisies": "https://cdn.playhive.com/maps/grav_daisies.jpg",
+    "Deepscape": "https://cdn.playhive.com/maps/grav_deepscape.jpg", 
+    "Dimensions": "https://cdn.playhive.com/maps/grav_dimensions.jpg",
+    "Dungeon": "https://cdn.playhive.com/maps/grav_dungeon.jpg",
+    "Labyrinth": "https://cdn.playhive.com/maps/grav_labyrinth.jpg",
+    "Lilypads": "https://cdn.playhive.com/maps/grav_lilypads.jpg",
+    "New Orleans": "https://cdn.playhive.com/maps/grav_neworleans.jpg",
+    "Post Office": "https://cdn.playhive.com/maps/grav_postoffice.jpg",
+    "Road Trip": "https://cdn.playhive.com/maps/grav_roadtrip.jpg", 
+    "Stained Glass": "https://cdn.playhive.com/maps/grav_stainedglass.jpg",
+    "Tomes": "https://cdn.playhive.com/maps/grav_tomes.jpg",
+    "Burrow": "https://cdn.playhive.com/maps/grav_burrow.jpg",
+    "Circuit Board": "https://cdn.playhive.com/maps/grav_circuitboard.jpg",
+    "Geometric": "https://cdn.playhive.com/maps/grav_geometric.jpg",
+    "Shanty Town": "https://cdn.playhive.com/maps/grav_shantytown.jpg",
+    "Space": "https://cdn.playhive.com/maps/grav_space.jpg",
+    "Triangles": "https://cdn.playhive.com/maps/grav_triangles.jpg",
+    "Twisted": "https://cdn.playhive.com/maps/grav_twisted.jpg",
+    "Under The Sea": "https://cdn.playhive.com/maps/grav_underthesea.jpg",
 }
 
 # --- ユーティリティ関数（画像生成用） ---
@@ -60,11 +91,18 @@ def _fetch_image(url):
 def _fetch_background(division_name, size):
     # 部門名から対応する背景を探す
     bg_url = BACKGROUND_URLS["default"]
-    for key, url in BACKGROUND_URLS.items():
-        if key.lower() in division_name.lower():
-            bg_url = url
-            break
     
+    # 【対策】キーの文字数が長い順（より具体的な順）にソートしてチェックする
+    # 例: "5 Maps (No Custom Server)" が "5 Maps" より先にチェックされるようにする
+    sorted_keys = sorted(BACKGROUND_URLS.keys(), key=len, reverse=True)
+    
+    for key in sorted_keys:
+        if key == "default":
+            continue
+        if key.lower() in division_name.lower():
+            bg_url = BACKGROUND_URLS[key]
+            break
+            
     img = _fetch_image(bg_url)
     if not img:
         img = Image.new("RGB", size, (18, 24, 36))
