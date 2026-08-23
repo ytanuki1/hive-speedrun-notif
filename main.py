@@ -198,18 +198,16 @@ def main():
     new_runs.reverse()
     
     for run in new_runs:
-        # --- ここから修正 ---
+        # レベル名・カテゴリ名の安全な取得
         level_name = ""
         level_rel = run.get("level")
         if isinstance(level_rel, dict):
-            # embedされたデータがdictの場合
             level_data = level_rel.get("data", {})
             if isinstance(level_data, dict):
                 level_name = level_data.get("name", "")
             elif isinstance(level_data, list) and len(level_data) > 0:
                 level_name = level_data[0].get("name", "")
         elif isinstance(level_rel, list) and len(level_rel) > 0:
-            # embedされたデータがlistの場合
             if isinstance(level_rel[0], dict):
                 level_name = level_rel[0].get("name", "")
 
@@ -224,6 +222,9 @@ def main():
         elif isinstance(cat_rel, list) and len(cat_rel) > 0:
             if isinstance(cat_rel[0], dict):
                 category_name = cat_rel[0].get("name", "")
+        
+        # ★デバッグ用に出力してみる
+        print(f"取得データ確認 -> Level: '{level_name}' / Category: '{category_name}'")
         # --- ここまで修正 ---
 
         division_name = f"{level_name} - {category_name}".strip(" -")
