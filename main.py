@@ -56,6 +56,7 @@ BACKGROUND_URLS = {
     "Triangles": "https://cdn.playhive.com/maps/grav_triangles.jpg",
     "Twisted": "https://cdn.playhive.com/maps/grav_twisted.jpg",
     "Under The Sea": "https://cdn.playhive.com/maps/grav_underthesea.jpg",
+    "default": "https://i.imgur.com/xfFhLxa.png",
 }
 
 # --- ユーティリティ関数（画像生成用） ---
